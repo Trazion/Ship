@@ -1,0 +1,33 @@
+# Security headers
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-Frame-Options "SAMEORIGIN"
+Header always set X-XSS-Protection "1; mode=block"
+
+# Disable directory listing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "^(config|\.htaccess|install\.php)$">
+    Order deny,allow
+    Deny from all
+</FilesMatch>
+
+# Redirect to login if not authenticated
+<FilesMatch "\.(php)$">
+    AuthType Basic
+    AuthName "Restricted Access"
+    AuthUserFile /dev/null
+    Require valid-user
+</FilesMatch>
+
+# PHP settings
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+php_value max_execution_time 300
+php_value max_input_time 300
+
+# URL rewriting (optional)
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [L,QSA]
